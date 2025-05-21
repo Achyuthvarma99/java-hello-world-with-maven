@@ -28,12 +28,10 @@ jobs:
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Set dynamic image tag
-        id: tag
+      - name: Debug vars
         run: |
-          DATE_TAG=$(date +%Y%m%d-%H%M)
-          SHORT_SHA=${GITHUB_SHA::7}
-          echo "IMAGE_TAG=${DATE_TAG}-${SHORT_SHA}" >> $GITHUB_ENV
+          echo "ECR_REPOSITORY=$ECR_REPOSITORY"
+          echo "IMAGE_TAG=$IMAGE_TAG"
 
       - name: Build, tag, and push Docker image to Amazon ECR
         run: |
