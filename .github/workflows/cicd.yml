@@ -9,38 +9,37 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
-    env:  # Global environment variables
+    env:
       AWS_REGION: ap-south-1
-      ECR_REGISTRY: 794038257373.dkr.ecr.ap-south-1.amazonaws.com
-      ECR_REPOSITORY: docker-ecr-demo
+      ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+      ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-    - name: Login to Amazon ECR
-      uses: aws-actions/amazon-ecr-login@v2
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
 
-    - name: Set dynamic image tag
-      id: tag
-      run: |
-        DATE_TAG=$(date +%Y%m%d-%H%M)
-        SHORT_SHA=${GITHUB_SHA::7}
-        echo "IMAGE_TAG=${DATE_TAG}-${SHORT_SHA}" >> $GITHUB_ENV
+      - name: Set dynamic image tag
+        id: tag
+        run: |
+          DATE_TAG=$(date +%Y%m%d-%H%M)
+          SHORT_SHA=${GITHUB_SHA::7}
+          echo "IMAGE_TAG=${DATE_TAG}-${SHORT_SHA}" >> $GITHUB_ENV
 
-     - name: Build, tag, and push Docker image to Amazon ECR
-      run: |
-        docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
-        docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      - name: Build, tag, and push Docker image to Amazon ECR
+        run: |
+          docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
+          docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-    - name: Push Docker image to ECR
-      run: |
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      - name: Output image URI
+        run: echo "✅ Pushed image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
