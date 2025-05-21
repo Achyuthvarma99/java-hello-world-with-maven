@@ -35,10 +35,11 @@ jobs:
         SHORT_SHA=${GITHUB_SHA::7}
         echo "IMAGE_TAG=${DATE_TAG}-${SHORT_SHA}" >> $GITHUB_ENV
 
-    - name: Build Docker image
+     - name: Build, tag, and push Docker image to Amazon ECR
       run: |
         docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
         docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
     - name: Push Docker image to ECR
       run: |
