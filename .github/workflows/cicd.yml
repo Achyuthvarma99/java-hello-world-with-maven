@@ -5,6 +5,13 @@ on:
     branches:
       - main
 
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
