@@ -28,9 +28,14 @@ jobs:
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
+      # 🧠 NEW: Set IMAGE_TAG variable
+      - name: Set IMAGE_TAG
+        run: echo "IMAGE_TAG=$(date +%Y%m%d-%H%M)-${GITHUB_SHA::7}" >> $GITHUB_ENV
+
       - name: Debug vars
         run: |
           echo "ECR_REPOSITORY=$ECR_REPOSITORY"
+          echo "ECR_REGISTRY=$ECR_REGISTRY"
           echo "IMAGE_TAG=$IMAGE_TAG"
 
       - name: Build, tag, and push Docker image to Amazon ECR
